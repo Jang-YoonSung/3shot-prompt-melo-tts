@@ -13,9 +13,12 @@ import base64
 import librosa
 from whisper_timestamped.transcribe import get_audio_tensor, get_vad_segments
 
+import logging
+
 model_size = "medium"
 # Run on GPU with FP16
 model = None
+
 def split_audio_whisper(audio_path, audio_name, target_dir='processed'):
     global model
     if model is None:
@@ -24,7 +27,6 @@ def split_audio_whisper(audio_path, audio_name, target_dir='processed'):
     max_len = len(audio)
 
     target_folder = os.path.join(target_dir, audio_name)
-    
     segments, info = model.transcribe(audio_path, beam_size=5, word_timestamps=True)
     segments = list(segments)    
 
@@ -86,7 +88,6 @@ def split_audio_vad(audio_path, audio_name, target_dir, split_seconds=10.0):
     )
     segments = [(seg["start"], seg["end"]) for seg in segments]
     segments = [(float(s) / SAMPLE_RATE, float(e) / SAMPLE_RATE) for s,e in segments]
-    print(segments)
     audio_active = AudioSegment.silent(duration=0)
     audio = AudioSegment.from_file(audio_path)
 
@@ -127,6 +128,7 @@ def hash_numpy_array(audio_path):
     return base64_value.decode('utf-8')[:16].replace('/', '_^')
 
 def get_se(audio_path, vc_model, target_dir='processed', vad=True):
+    print(vc_model.device)
     device = vc_model.device
     version = vc_model.version
     print("OpenVoice version:", version)
@@ -139,15 +141,12 @@ def get_se(audio_path, vc_model, target_dir='processed', vad=True):
     #     return se, audio_name
     # if os.path.isdir(audio_path):
     #     wavs_folder = audio_path
-    
     if vad:
         wavs_folder = split_audio_vad(audio_path, target_dir=target_dir, audio_name=audio_name)
     else:
         wavs_folder = split_audio_whisper(audio_path, target_dir=target_dir, audio_name=audio_name)
-    
     audio_segs = glob(f'{wavs_folder}/*.wav')
     if len(audio_segs) == 0:
         raise NotImplementedError('No audio segments found!')
     
     return vc_model.extract_se(audio_segs, se_save_path=se_path), audio_name
-
