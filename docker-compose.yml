@@ -1,8 +1,8 @@
-version: '1.1'
+version: '2.0'
 
 services:
   tgen_service: # 내가 원하는 서비스 이름
-    image: tgen:1.1
+    image: tgen:2.0
     container_name: tgen
     # runtime: nvidia
     devices:
