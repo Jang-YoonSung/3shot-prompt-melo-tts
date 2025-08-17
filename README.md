@@ -1,24 +1,86 @@
-## Introduction
+# 🎯 3shot-Prompt-Melo-TTS
 
-### Fast API를 사용한 Docker 기반 llm 서비스
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.111+-green.svg)
+![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
 
-**1. text generation using llama3 - few shot prompting**
+FastAPI 기반 **키워드 기반 텍스트 생성 & 음성 합성 서비스**입니다.  
+Llama3 모델과 Melo-TTS를 활용하며, 3-shot prompting을 적용하여 텍스트 품질을 향상시킨 폐쇄망 서비스입니다.
 
-- stt를 통한 음성파일 요약에서 모르는 단어가 나올 경우 성능이 떨어진다는 문제점을 통해 고안한 방법
-- 허깅페이스의 라마3 한국어 파인튜닝 모델을 사용
-- 파인튜닝 없이 간단한 몇개의 예시만으로 모델의 성능이 크게 향상
+---
 
-**2. Melo TTS 서비스 (OpenSource model)**
+## 🚀 Features
+- ✍️ **Text Generation API**: 키워드 기반 문장 생성 (모델: Llama3)
+- 🔊 **TTS (Text-to-Speech)**: 한국어 텍스트 → 자연스러운 음성 합성 (Melo-TTS)
+- 🐳 **Docker Compose 지원**: 로컬/서버 환경 어디서든 빠른 실행 가능
+- 📡 **Swagger UI**: 직관적인 API 테스트 및 문서화
 
-- 모델이 모르는 사내 약어나 전문적인 단어를 generation 모델로 생성 후, tts를 통해 wav파일로 전송
-- back-end를 통해 stt 학습 서버로 전송
+---
 
-**3. OpenVoice 목소리 변경 시스템 (OpenSource)**
+## 📂 Project Structure
+```bash
+3shot-prompt-melo-tts/
+├── openvoice            # 목소리 복제 라이브러리
+├── router/              # API 라우터
+│   └── db.py
+├── service/             # API 서비스
+│   └── db_service.py    
+├── main.py
+├── Dockerfile  
+├── docker-compose.yml
+├── test.py              # 폐쇠망 및 서비스 테스트
+├── requirements.txt
+└── README.md
+```
 
-- Melo TTS 개발자들이 해당 모델의 Fine-tuning에 불편함과 에러사항이 많다는 점을 참고하여 만든 서비스
-- 원하는 음성 파일을 입력하면 해당 음성을 분석하여 기본 음성으로 만들어진 wav 파일에 음성을 튜닝
+## 🏗 System Architecture
+```bash
++-------------------+       +-------------------+       +-------------------+
+|                   |       |                   |       |                   |
+|   FastAPI Server  +------>+   Llama Model     +------>+   Melo-TTS Model  |
+|                   |       |                   |       |                   |
++-------------------+       +-------------------+       +-------------------+
+```
+* FastAPI Server: 클라이언트로부터 키워드를 받아 Llama 모델에 전달
 
-**4. 도커 기반 환경 구성**
+* Llama Model: 키워드를 기반으로 문장 생성
 
-- docker hub의 엔비디아 쿠다 이미지를 사용하여 원하는 쿠다 버전과, 파이썬 버전을 선택할 수 있게 이미지를 구성
-- MeloTTS와의 의존성 검증
+* Melo-TTS Model: 생성된 문장을 음성으로 변환
+
+## ⚙️ Installation & Usage
+
+1️⃣ Clone Repository
+```bash
+git clone https://github.com/Jang-YoonSung/3shot-prompt-melo-tts.git
+cd 3shot-prompt-melo-tts
+```
+2️⃣ Setup Environment
+
+```.env``` 파일 생성:
+```bash
+# 환경 변수 설정 (필요 시 추가)
+```
+3️⃣ Run with Docker Compose
+```bash
+docker-compose up --build
+```
+서비스 실행 후 Swagger UI에서 API 테스트 가능:
+
+👉 http://localhost:8000/docs
+
+## 🛠 Tech Stack
+* Python - Programming Language
+
+* FastAPI - Web Framework
+
+* Llama3 - Text Generation Model
+
+* Melo-TTS - Text-to-Speech Model (한국어)
+
+* Docker - Containerization
+
+## 📄 License
+MIT License
+
+© 2025 Jang-YoonSung
